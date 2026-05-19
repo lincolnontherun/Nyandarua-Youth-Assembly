@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Nyandarua Youth Assembly – A youth-led movement dedicated to representing, uniting, and empowering young people across Nyandarua County.">
+<title>Nyandarua Youth Assembly</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+/* SHARED COLORS */
+--emerald:#10B981;
+--lime:#A3E635;
+--green-deep:#052E16;
+--green-mid:#0a4a25;
+
+/* LIGHT MODE VARIABLES (Default Appearance) */
+--bg-main:#F8FAFC;
+--bg-secondary:#f1f5f9;
+--text-main:#020617;
+--text-muted:#475569;
+--glass:rgba(15, 23, 42, 0.05);
+--glass-border:rgba(15, 23, 42, 0.1);
+--glow:rgba(16, 185, 129, 0.2);
+--glow-lime:rgba(163, 230, 53, 0.15);
+--card-bg: #ffffff;
+--mesh-opacity: 0.06;
+--orb-opacity: 0.12;
+}
+
+/* DARK MODE OVERRIDES */
+body.dark-mode {
+--bg-main:#020617;
+--bg-secondary:#041a0d;
+--text-main:#F8FAFC;
+--text-muted:rgba(248, 250, 252, 0.6);
+--glass:rgba(255, 255, 255, 0.06);
+--glass-border:rgba(255, 255, 255, 0.12);
+--glow:rgba(16, 185, 129, 0.4);
+--glow-lime:rgba(163, 230, 53, 0.3);
+--card-bg: rgba(255,255,255,0.06);
+--mesh-opacity: 0.03;
+--orb-opacity: 0.08;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+background:var(--bg-main);
+color:var(--text-main);
+font-family:'Inter',sans-serif;
+overflow-x:hidden;
+cursor:none;
+transition: background 0.4s ease, color 0.4s ease;
+}
+
+/* UI COMPONENTS */
+#cursor{ position:fixed; width:12px; height:12px; background:var(--emerald); border-radius:50%; pointer-events:none; z-index:9999; transform:translate(-50%,-50%); transition:transform 0.1s; }
+#cursor-trail{ position:fixed; width:40px; height:40px; border:1px solid var(--emerald); border-radius:50%; pointer-events:none; z-index:9998; transform:translate(-50%,-50%); transition:transform 0.15s ease; }
+body.link-hover #cursor{width:24px;height:24px;background:var(--lime);}
+
+#scroll-progress{ position:fixed; top:0; left:0; height:3px; background:linear-gradient(90deg,var(--emerald),var(--lime)); z-index:10000; width:0%; transition:width 0.1s; }
+
+#loader{ position:fixed; inset:0; background:var(--bg-main); z-index:99999; display:flex; flex-direction:column; align-items:center; justify-content:center; transition:opacity 0.8s; }
+#loader.hidden{opacity:0; visibility:hidden;}
+.loader-ring{ width:80px; height:80px; border:2px solid var(--glass-border); border-top:2px solid var(--emerald); border-radius:50%; animation:spin 1s linear infinite; }
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* NAVIGATION */
+nav{ position:fixed; top:0; left:0; right:0; z-index:1000; padding:20px 5%; display:flex; align-items:center; justify-content:space-between; transition:all 0.4s ease; }
+nav.scrolled{ background:var(--bg-main); backdrop-filter:blur(20px); border-bottom:1px solid var(--glass-border); padding:14px 5%; }
+.nav-logo{ font-family:'Poppins'; font-weight:800; font-size:18px; color:var(--text-main); text-decoration:none; display:flex; align-items:center; gap:10px; }
+.nav-links{ display:flex; align-items:center; gap:32px; list-style:none; }
+.nav-links a{ color:var(--text-main); text-decoration:none; font-size:14px; font-weight:500; transition:opacity 0.3s; opacity:0.7; }
+.nav-links a:hover{ opacity:1; }
+
+/* THEME TOGGLE */
+.theme-toggle-btn {
+background: var(--glass);
+border: 1px solid var(--glass-border);
+color: var(--text-main);
+width: 44px; height: 44px;
+border-radius: 50%;
+cursor: pointer;
+display: flex; align-items: center; justify-content: center;
+font-size: 20px;
+transition: all 0.3s;
+}
+
+/* HERO SECTION */
+#hero{ min-height:100vh; display:flex; align-items:center; position:relative; overflow:hidden; padding:0 5%; }
+.hero-bg{ position:absolute; inset:0; background:radial-gradient(ellipse 80% 80% at 50% -20%,var(--glow) 0%,transparent 60%), radial-gradient(ellipse 60% 60% at 80% 80%,var(--glow-lime) 0%,transparent 60%); z-index:-2; }
+.hero-mesh{ position:absolute; inset:0; background-image: linear-gradient(rgba(16,185,129,var(--mesh-opacity)) 1px,transparent 1px), linear-gradient(90deg,rgba(16,185,129,var(--mesh-opacity)) 1px,transparent 1px); background-size:60px 60px; animation:mesh-drift 20s ease infinite; z-index:-1; }
+@keyframes mesh-drift{0%,100%{transform:translate(0,0);}50%{transform:translate(-10px,-10px);}}
+
+#particles-hero{ position:absolute; inset:0; overflow:hidden; z-index:0; }
+.particle{ position:absolute; border-radius:50%; animation:float-particle linear infinite; background:var(--emerald); }
+@keyframes float-particle{ 0%{transform:translateY(100vh); opacity:0;} 10%{opacity:0.5;} 90%{opacity:0.5;} 100%{transform:translateY(-100px); opacity:0;} }
+
+.glow-orb{ position:absolute; border-radius:50%; filter:blur(80px); pointer-events:none; animation:orb-drift 8s ease-in-out infinite; z-index:-1; }
+@keyframes orb-drift{0%,100%{transform:translate(0,0);} 33%{transform:translate(30px,-20px);} }
+
+.hero-content{ position:relative; z-index:2; max-width:760px; }
+.hero-headline{ font-family:'Poppins'; font-size:clamp(42px,6vw,88px); font-weight:900; line-height:1.05; margin-bottom:24px; }
+.highlight{ background:linear-gradient(135deg,var(--emerald),var(--lime)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+.hero-sub{ font-size:clamp(16px,1.8vw,20px); color:var(--text-muted); line-height:1.7; margin-bottom:48px; }
+
+/* SHARED SECTION STYLES */
+section{padding:100px 5%;}
+.section-label{ color:var(--emerald); text-transform:uppercase; font-size:12px; letter-spacing:3px; margin-bottom:20px; font-weight:700; display:flex; align-items:center; gap:8px; }
+.section-label::before{ content:''; width:24px; height:1px; background:var(--emerald); }
+.section-title{ font-family:'Poppins'; font-size:clamp(32px,4vw,56px); font-weight:800; margin-bottom:20px; }
+
+/* FEATURES */
+.features-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:24px; margin-top:60px; }
+.feature-card{ background:var(--card-bg); border:1px solid var(--glass-border); border-radius:24px; padding:40px 36px; transition:0.4s; position:relative; overflow:hidden; }
+.feature-card:hover{ transform:translateY(-8px); border-color:var(--emerald); box-shadow:0 20px 40px var(--glow); }
+.feature-icon{ font-size:32px; margin-bottom:24px; display:block; }
+.feature-number{ position:absolute; bottom:20px; right:20px; font-size:80px; font-weight:900; color:var(--emerald); opacity:0.05; }
+
+/* LEADERSHIP */
+.leaders-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:24px; margin-top:40px; }
+.leader-card{ background:var(--card-bg); border:1px solid var(--glass-border); border-radius:24px; padding:32px; text-align:center; transition:0.4s; }
+.leader-card:hover{ border-color:var(--emerald); transform:translateY(-5px); }
+.avatar-ring{ width:100px; height:100px; border-radius:50%; margin:0 auto 20px; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:24px; color:white; }
+.leader-role{ color:var(--emerald); font-weight:600; font-size:14px; margin-bottom:10px; }
+.leader-bio{ font-size:12px; opacity:0.6; line-height:1.6; }
+
+/* GALLERY */
+.gallery-grid{ columns:3; gap:20px; }
+.gallery-item{ break-inside:avoid; margin-bottom:20px; border-radius:16px; overflow:hidden; position:relative; background:var(--card-bg); border:1px solid var(--glass-border); }
+.gallery-placeholder{ display:flex; flex-direction:column; align-items:center; justify-content:center; transition:0.4s; }
+.gallery-item:hover .gallery-placeholder{ transform:scale(1.05); }
+
+/* CONTACT */
+.contact-grid{ display:grid; grid-template-columns:1fr 1.4fr; gap:60px; }
+.contact-card{ background:var(--card-bg); border:1px solid var(--glass-border); border-radius:20px; padding:28px; margin-bottom:20px; display:flex; gap:16px; }
+.contact-form{ background:var(--card-bg); border:1px solid var(--glass-border); border-radius:24px; padding:48px; }
+.form-group{ position:relative; margin-bottom:24px; }
+.form-group input, .form-group textarea{ width:100%; padding:16px; background:var(--bg-main); border:1px solid var(--glass-border); border-radius:12px; color:var(--text-main); outline:none; }
+
+/* PAGE TRANSITIONS */
+.page{ display:none; animation:page-enter 0.5s ease forwards; }
+.page.active{ display:block; }
+@keyframes page-enter{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+
+footer{ background:var(--bg-main); padding:80px 5%; border-top:1px solid var(--glass-border); margin-top:50px; }
+.typing-cursor{ display:inline-block; width:3px; height:1em; background:var(--emerald); animation:blink 1s ease infinite; vertical-align:middle; margin-left:4px; }
+@keyframes blink{0%,50%{opacity:1;}51%,100%{opacity:0;}}
+
+/* REVEAL ANIMATION */
+.reveal{ opacity:0; transform:translateY(30px); transition:0.8s ease; }
+.reveal.visible{ opacity:1; transform:translateY(0); }
+
+@media(max-width:768px){ .nav-links{display:none;} .gallery-grid{columns:1;} .contact-grid{grid-template-columns:1fr;} }
+</style>
+</head>
+<body class="light-mode">
+
+<div id="loader">
+    <div class="loader-ring"></div>
+    <p style="color:var(--emerald); margin-top:15px; font-weight:600; letter-spacing:2px;">NYA</p>
+</div>
+
+<div id="scroll-progress"></div>
+<div id="cursor"></div>
+<div id="cursor-trail"></div>
+
+<nav id="navbar">
+    <a href="#" class="nav-logo" onclick="showPage('home')">
+        <div style="width:12px; height:12px; background:var(--emerald); border-radius:50%;"></div> NYA
+    </a>
+    <ul class="nav-links">
+        <li><a href="#" onclick="showPage('home')">Home</a></li>
+        <li><a href="#" onclick="showPage('about')">About</a></li>
+        <li><a href="#" onclick="showPage('leaders')">Leaders</a></li>
+        <li><a href="#" onclick="showPage('gallery')">Gallery</a></li>
+        <li><a href="#" onclick="showPage('contact')">Contact</a></li>
+        <li><button class="theme-toggle-btn" onclick="toggleTheme()" id="theme-toggle">🌙</button></li>
+        <li><a href="#" style="background:var(--emerald); color:white!important; padding:12px 24px; border-radius:50px; font-weight:800; opacity:1;">Join Us</a></li>
+    </ul>
+</nav>
+
+<div id="page-home" class="page active">
+    <section id="hero">
+        <div class="hero-bg"></div>
+        <div class="hero-mesh"></div>
+        <div id="particles-hero"></div>
+        <div class="glow-orb" style="width:400px; height:400px; background:var(--emerald); top:-10%; right:-10%; opacity:var(--orb-opacity);"></div>
+        
+        <div class="hero-content">
+            <div class="section-label">Nyandarua County, Kenya</div>
+            <h1 class="hero-headline">Empowering<br>Nyandarua's<br><span class="highlight" id="typing-text">Future Leaders</span><span class="typing-cursor"></span></h1>
+            <p class="hero-sub">We are a youth-led movement dedicated to representing, uniting, and empowering young people across Nyandarua County to shape our collective future.</p>
+            <div style="display:flex; gap:16px;">
+                <a href="#" class="btn-primary" onclick="showPage('contact')">Join Our Movement</a>
+                <a href="#" class="btn-secondary" onclick="scrollToFeatures()">Our Pillars</a>
+            </div>
+        </div>
+    </section>
+
+    <section id="features">
+        <div class="section-label">What We Do</div>
+        <h2 class="section-title reveal">Transforming Youth Potential</h2>
+        <div class="features-grid">
+            <div class="feature-card reveal">
+                <span class="feature-icon">🌱</span>
+                <h3>Youth Empowerment</h3>
+                <p>Developing essential leadership skills and confidence through structured mentorship programs.</p>
+                <div class="feature-number">01</div>
+            </div>
+            <div class="feature-card reveal">
+                <span class="feature-icon">💡</span>
+                <h3>Innovation Hub</h3>
+                <p>Creating digital and entrepreneurship platforms for youth to thrive in the modern economy.</p>
+                <div class="feature-number">02</div>
+            </div>
+            <div class="feature-card reveal">
+                <span class="feature-icon">🗳️</span>
+                <h3>Civic Engagement</h3>
+                <p>Amplifying youth voices in county governance and policy-making processes.</p>
+                <div class="feature-number">03</div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<div id="page-about" class="page">
+    <section>
+        <div class="section-label">Our Story</div>
+        <h1 class="section-title">Leading the Way for a Brighter Nyandarua</h1>
+        <p style="font-size:18px; line-height:1.8; opacity:0.8; max-width:800px; margin-bottom:40px;">
+            The Nyandarua Youth Assembly was established to provide a structured, inclusive forum where young people can articulate their issues and participate in county decision-making processes. 
+        </p>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:32px;">
+            <div style="background:var(--card-bg); padding:40px; border-radius:24px; border:1px solid var(--glass-border);">
+                <h3 style="margin-bottom:15px; color:var(--emerald);">Our Mission</h3>
+                <p>To promote meaningful youth engagement through leadership development, civic education, and community-driven initiatives that enhance democratic growth.</p>
+            </div>
+            <div style="background:var(--card-bg); padding:40px; border-radius:24px; border:1px solid var(--glass-border);">
+                <h3 style="margin-bottom:15px; color:var(--emerald);">Our Vision</h3>
+                <p>To be the premier youth-led organization empowering the next generation to shape sustainable development across the county and beyond.</p>
+            </div>
+        </div>
+    </section>
+</div>
+
+<div id="page-leaders" class="page">
+    <section>
+        <div class="section-label">Executive Leadership</div>
+        <h2 class="section-title">The Team Behind the Vision</h2>
+        <div class="leaders-grid" id="exec-grid"></div>
+        
+        <div class="section-label" style="margin-top:80px;">Parliament Representatives</div>
+        <h2 class="section-title">Constituency Voice</h2>
+        <div class="leaders-grid" id="parl-grid"></div>
+    </section>
+</div>
+
+<div id="page-gallery" class="page">
+    <section>
+        <div class="section-label">Moments of Impact</div>
+        <h2 class="section-title">Our Journey in Pictures</h2>
+        <div class="gallery-grid" id="gallery-grid"></div>
+    </section>
+</div>
+
+<div id="page-contact" class="page">
+    <section class="contact-grid">
+        <div class="contact-info">
+            <div class="section-label">Contact Us</div>
+            <h2 class="section-title">Let's Build Together</h2>
+            <div class="contact-card">
+                <span>📍</span>
+                <div>
+                    <h4>Location</h4>
+                    <p>Nyandarua County Headquarters, Ol Kalou</p>
+                </div>
+            </div>
+            <div class="contact-card">
+                <span>📧</span>
+                <div>
+                    <h4>Email</h4>
+                    <p>nyandaruayouthassembly@gmail.com</p>
+                </div>
+            </div>
+            <div class="contact-card">
+                <span>📞</span>
+                <div>
+                    <h4>Phone</h4>
+                    <p>+254 702 381 981</p>
+                </div>
+            </div>
+        </div>
+        <div class="contact-form">
+            <div class="form-group"><input type="text" placeholder="Full Name"></div>
+            <div class="form-group"><input type="email" placeholder="Email Address"></div>
+            <div class="form-group"><textarea rows="5" placeholder="Your Message"></textarea></div>
+            <button style="width:100%; padding:18px; border-radius:12px; border:none; background:var(--emerald); color:white; font-weight:800; cursor:pointer;">Send Message</button>
+        </div>
+    </section>
+</div>
+
+<footer id="footer">
+    <div style="text-align:center;">
+        <p style="opacity:0.6;">© 2024 Nyandarua Youth Assembly. All rights reserved.</p>
+    </div>
+</footer>
+
+<script>
+// FULL DATASET
+const leaders = [
+    {name:'Geoffrey Ngacha', role:'Founder & President', initials:'GN', type:'exec'},
+    {name:'Brian Kimani', role:'Founder & Deputy President', initials:'BK', type:'exec'},
+    {name:'Naomi', role:'Founder & Sitting MCA', initials:'NM', type:'exec'},
+    {name:'Maina Abdul', role:'Deputy Secretary General', initials:'MA', type:'exec'},
+    {name:'Robert Kamau', role:'Chief of Staff', initials:'RK', type:'exec'},
+    {name:'Joyce Muthoni', role:'Director of Programmes', initials:'JM', type:'exec'},
+    {name:'Ann Ngigi', role:'MP – Kipipiri', initials:'AN', type:'parl'},
+    {name:'Dexter Lewis Rubia', role:'MP – Kinangop', initials:'DL', type:'parl'},
+    {name:'John Kamau', role:'MP – Ol Kalou', initials:'JK', type:'parl'},
+    {name:'Simon Kaguai', role:'MP – Oljororok', initials:'SK', type:'parl'}
+];
+
+const galleryItems = [
+    {emoji:'🎤', label:'Leadership Summit', h:280},
+    {emoji:'🌱', label:'Environmental Drive', h:320},
+    {emoji:'💡', label:'Innovation Workshop', h:240},
+    {emoji:'🤝', label:'Community Outreach', h:260},
+    {emoji:'🎓', label:'Youth Graduation', h:220},
+    {emoji:'🗳️', label:'Civic Forum', h:300}
+];
+
+// THEME TOGGLE
+function toggleTheme() {
+    const body = document.body;
+    const btn = document.getElementById('theme-toggle');
+    body.classList.toggle('dark-mode');
+    const isDark = body.classList.contains('dark-mode');
+    btn.textContent = isDark ? '☀️' : '🌙';
+    localStorage.setItem('nya-theme', isDark ? 'dark' : 'light');
+    createParticles(); // Refresh particles for theme
+}
+
+if(localStorage.getItem('nya-theme') === 'dark') {
+    document.body.classList.add('dark-mode');
+    document.getElementById('theme-toggle').textContent = '☀️';
+}
+
+// NAVIGATION
+function showPage(id) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    const target = document.getElementById('page-' + id);
+    if(target) {
+        target.classList.add('active');
+        window.scrollTo(0,0);
+        initReveal();
+    }
+}
+
+// CURSOR
+const cursor = document.getElementById('cursor');
+const trail = document.getElementById('cursor-trail');
+let mx=0, my=0, tx=0, ty=0;
+document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; cursor.style.left = mx+'px'; cursor.style.top = my+'px'; });
+function anim() { tx += (mx - tx) * 0.12; ty += (my - ty) * 0.12; trail.style.left = tx+'px'; trail.style.top = ty+'px'; requestAnimationFrame(anim); }
+anim();
+
+// RENDERING
+function renderAll() {
+    const execGrid = document.getElementById('exec-grid');
+    const parlGrid = document.getElementById('parl-grid');
+    const galleryGrid = document.getElementById('gallery-grid');
+    const colors = ['#10B981', '#A3E635', '#059669', '#65a30d'];
+
+    leaders.forEach((l, i) => {
+        const html = `<div class="leader-card reveal">
+            <div class="avatar-ring" style="background:${colors[i % 4]}">${l.initials}</div>
+            <h4>${l.name}</h4>
+            <p class="leader-role">${l.role}</p>
+        </div>`;
+        if(l.type === 'exec') execGrid.innerHTML += html;
+        else parlGrid.innerHTML += html;
+    });
+
+    galleryItems.forEach(item => {
+        galleryGrid.innerHTML += `<div class="gallery-item reveal">
+            <div class="gallery-placeholder" style="height:${item.h}px; background:var(--glass);">
+                <span style="font-size:40px;">${item.emoji}</span>
+                <p style="margin-top:10px; opacity:0.6;">${item.label}</p>
+            </div>
+        </div>`;
+    });
+}
+
+// PARTICLES
+function createParticles(){
+    const container = document.getElementById('particles-hero');
+    if(!container) return;
+    container.innerHTML = '';
+    for(let i=0; i<30; i++){
+        const p = document.createElement('div');
+        p.className = 'particle';
+        const size = Math.random()*4+1;
+        p.style.cssText = `width:${size}px; height:${size}px; left:${Math.random()*100}%; animation-duration:${Math.random()*15+10}s; opacity:0.4;`;
+        container.appendChild(p);
+    }
+}
+
+// TYPING ENGINE
+function typingAnimation(){
+    const words = ['Future Leaders', 'Change Makers', 'Innovators', 'Visionaries'];
+    let wi=0, ci=0, del=false;
+    const el = document.getElementById('typing-text');
+    function type(){
+        const word = words[wi];
+        el.textContent = del ? word.substring(0, ci--) : word.substring(0, ci++);
+        if(!del && ci > word.length) { del=true; setTimeout(type, 2000); return; }
+        if(del && ci < 0) { del=false; wi=(wi+1)%words.length; setTimeout(type, 500); return; }
+        setTimeout(type, del ? 60 : 120);
+    }
+    type();
+}
+
+function initReveal() {
+    const reveals = document.querySelectorAll('.reveal');
+    reveals.forEach(el => {
+        const rect = el.getBoundingClientRect();
+        if(rect.top < window.innerHeight * 0.9) el.classList.add('visible');
+    });
+}
+
+window.addEventListener('scroll', () => {
+    document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50);
+    const scrolled = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+    document.getElementById('scroll-progress').style.width = scrolled + '%';
+    initReveal();
+});
+
+function scrollToFeatures() { document.getElementById('features').scrollIntoView({behavior:'smooth'}); }
+
+window.onload = () => {
+    renderAll();
+    createParticles();
+    typingAnimation();
+    setTimeout(() => {
+        document.getElementById('loader').classList.add('hidden');
+        initReveal();
+    }, 1500);
+};
+</script>
+</body>
+</html>
